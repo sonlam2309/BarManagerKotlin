@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/define_dimen_10"
+    android:layout_marginEnd="@dimen/define_dimen_10"
+    app:cardCornerRadius="@dimen/define_dimen_8">
+
+    <LinearLayout
+        android:id="@+id/layout_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/define_dimen_16"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/img_feature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_drink"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tv_feature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_size_small"
+            android:layout_marginTop="@dimen/define_dimen_6"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/feature_add_drink" />
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

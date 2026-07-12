@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "377665476980",
+    "firebase_url": "https://buchin-bar-default-rtdb.firebaseio.com",
+    "project_id": "buchin-bar",
+    "storage_bucket": "buchin-bar.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377665476980:android:a624b59dcff176ba53f421",
+        "android_client_info": {
+          "package_name": "com.app.buchin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377665476980-0i678eual4a55sudm61j5ukf688m61al.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKfakWDf4xgAW8XgrMnmrAfrTdMk5yaZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377665476980-0i678eual4a55sudm61j5ukf688m61al.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
