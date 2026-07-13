@@ -16,9 +16,9 @@ class SelectDrinkAdapter(context: Context, @LayoutRes resource: Int,
         var convertView = view
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_choose_option, null)
-            val tvSelected = convertView.findViewById<TextView?>(R.id.tv_selected)
-            tvSelected?.text = getItem(position)?.getName()
         }
+        val tvSelected = convertView.findViewById<TextView?>(R.id.tv_selected)
+        tvSelected?.text = getItem(position)?.getName()
         return convertView!!
     }
 

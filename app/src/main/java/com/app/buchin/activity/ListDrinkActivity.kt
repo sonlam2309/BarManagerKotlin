@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.buchin.MyApplication
@@ -36,20 +37,37 @@ class ListDrinkActivity : BaseActivity() {
     private var mKeySeach: String? = null
     private val mChildEventListener: ChildEventListener = object : ChildEventListener {
         @SuppressLint("NotifyDataSetChanged")
-        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
-            val drink: Drink? = dataSnapshot.getValue<Drink>(Drink::class.java)
-            if (drink == null || mListDrink == null || mDrinkAdapter == null) {
+        override fun onChildAdded(
+            dataSnapshot: DataSnapshot,
+            s: String?
+        ) {
+
+            Log.d("LIST_DRINK", "==============")
+            Log.d("LIST_DRINK", "Child Added")
+            Log.d("LIST_DRINK", "Key = ${dataSnapshot.key}")
+            Log.d("LIST_DRINK", "Value = ${dataSnapshot.value}")
+
+            val drink = dataSnapshot.getValue(Drink::class.java)
+
+            Log.d("LIST_DRINK", "Drink = $drink")
+
+            if (drink == null) {
+
+                Log.d("LIST_DRINK", "Drink NULL")
+
                 return
             }
-            if (StringUtil.isEmpty(mKeySeach)) {
-                mListDrink!!.add(0, drink)
-            } else {
-                if (GlobalFuntion.getTextSearch(drink.getName())!!.toLowerCase(Locale.getDefault())
-                                .contains(GlobalFuntion.getTextSearch(mKeySeach)!!.toLowerCase(Locale.getDefault()))) {
-                    mListDrink!!.add(0, drink)
-                }
-            }
+
+            mListDrink!!.add(0, drink)
+
+            Log.d("LIST_DRINK", "List Size = ${mListDrink!!.size}")
+
             mDrinkAdapter!!.notifyDataSetChanged()
+
+            Log.d(
+                "LIST_DRINK",
+                "Adapter Size = ${mDrinkAdapter!!.itemCount}"
+            )
         }
 
         @SuppressLint("NotifyDataSetChanged")
@@ -84,13 +102,17 @@ class ListDrinkActivity : BaseActivity() {
 
         override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {}
         override fun onCancelled(databaseError: DatabaseError) {
-            showToast(getString(R.string.msg_get_data_error))
+            showToast(databaseError.message)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d("LIST_DRINK", "onCreate")
+
         setContentView(R.layout.activity_list_drink)
+
         initToolbar()
         initUi()
         getListUnit()
@@ -205,17 +227,52 @@ class ListDrinkActivity : BaseActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                showToast(getString(R.string.msg_get_data_error))
+                showToast(error.message)
             }
         })
     }
 
     fun getListDrink() {
+
+        Log.d("LIST_DRINK", "getListDrink() called")
+
         if (mListDrink != null) {
             mListDrink!!.clear()
-            MyApplication[this].getDrinkDatabaseReference().removeEventListener(mChildEventListener)
+
+            Log.d("LIST_DRINK", "List cleared")
+
+            MyApplication[this]
+                .getDrinkDatabaseReference()
+                .removeEventListener(mChildEventListener)
         }
-        MyApplication[this].getDrinkDatabaseReference().addChildEventListener(mChildEventListener)
+
+        Log.d("LIST_DRINK", "Checking Firebase...")
+
+        MyApplication[this]
+            .getDrinkDatabaseReference()
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                Log.d("FIREBASE_CHECK", "========== FIREBASE CHECK ==========")
+                Log.d("FIREBASE_CHECK", "Exists = ${snapshot.exists()}")
+                Log.d("FIREBASE_CHECK", "Children Count = ${snapshot.childrenCount}")
+                Log.d("FIREBASE_CHECK", "Value = ${snapshot.value}")
+                Log.d("FIREBASE_CHECK", "===================================")
+
+            }
+            .addOnFailureListener { e ->
+
+                Log.e("FIREBASE_CHECK", "========== FIREBASE ERROR ==========")
+                Log.e("FIREBASE_CHECK", e.message ?: "Unknown Error")
+                Log.e("FIREBASE_CHECK", "===================================")
+
+            }
+
+        Log.d("LIST_DRINK", "Add ChildEventListener")
+
+        MyApplication[this]
+            .getDrinkDatabaseReference()
+            .addChildEventListener(mChildEventListener)
     }
 
     private fun searchDrink() {
@@ -229,6 +286,26 @@ class ListDrinkActivity : BaseActivity() {
     }
 
     private fun onClickAddOrEditDrink(drink: Drink?) {
+        MyApplication[this].getUnitDatabaseReference()
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (mListUnit != null) mListUnit!!.clear()
+                        for (dataSnapshot in snapshot.children) {
+                            val unitObject: UnitObject? = dataSnapshot.getValue<UnitObject>(UnitObject::class.java)
+                            if (unitObject != null) {
+                                mListUnit?.add(0, unitObject)
+                            }
+                        }
+                        showAddOrEditDrinkDialog(drink)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        showToast(error.message)
+                    }
+                })
+    }
+
+    private fun showAddOrEditDrinkDialog(drink: Drink?) {
         if (mListUnit == null || mListUnit!!.isEmpty()) {
             showToast(getString(R.string.msg_list_unit_require))
             return
@@ -281,7 +358,7 @@ class ListDrinkActivity : BaseActivity() {
                     showToast(getString(R.string.msg_drink_name_require))
                     return
                 }
-                if (isDrinkExist(strDrinkName)) {
+                if (isDrinkExist(strDrinkName, drink)) {
                     showToast(getString(R.string.msg_drink_exist))
                     return
                 }
@@ -293,7 +370,11 @@ class ListDrinkActivity : BaseActivity() {
                     drinkObject.setUnitId(mUnitSelected!!.getId())
                     drinkObject.setUnitName(mUnitSelected!!.getName())
                     MyApplication[this@ListDrinkActivity].getDrinkDatabaseReference()
-                            .child(id.toString()).setValue(drinkObject) { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(id.toString()).setValue(drinkObject) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@setValue
+                                }
                                 GlobalFuntion.hideSoftKeyboard(this@ListDrinkActivity, edtDrinkName)
                                 showToast(getString(R.string.msg_add_drink_success))
                                 dialog.dismiss()
@@ -305,7 +386,11 @@ class ListDrinkActivity : BaseActivity() {
                     map["unitId"] = mUnitSelected!!.getId()
                     map["unitName"] = mUnitSelected!!.getName()
                     MyApplication[this@ListDrinkActivity].getDrinkDatabaseReference()
-                            .child(drink.getId().toString()).updateChildren(map) { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(drink.getId().toString()).updateChildren(map) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@updateChildren
+                                }
                                 GlobalFuntion.hideSoftKeyboard(this@ListDrinkActivity, edtDrinkName)
                                 showToast(getString(R.string.msg_edit_drink_success))
                                 dialog.dismiss()
@@ -331,12 +416,12 @@ class ListDrinkActivity : BaseActivity() {
         return 0
     }
 
-    private fun isDrinkExist(drinkName: String?): Boolean {
+    private fun isDrinkExist(drinkName: String?, currentDrink: Drink?): Boolean {
         if (mListDrink == null || mListDrink!!.isEmpty()) {
             return false
         }
         for (drink in mListDrink!!) {
-            if (drinkName == drink.getName()) {
+            if (currentDrink?.getId() != drink.getId() && drinkName == drink.getName()) {
                 return true
             }
         }
@@ -349,7 +434,11 @@ class ListDrinkActivity : BaseActivity() {
                 .setMessage(getString(R.string.msg_confirm_delete))
                 .setPositiveButton(getString(R.string.action_delete)) { _: DialogInterface?, _: Int ->
                     MyApplication[this@ListDrinkActivity].getDrinkDatabaseReference()
-                            .child(drink?.getId().toString()).removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(drink?.getId().toString()).removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@removeValue
+                                }
                                 showToast(getString(R.string.msg_delete_drink_success))
                                 GlobalFuntion.hideSoftKeyboard(this@ListDrinkActivity)
                             }
@@ -364,7 +453,11 @@ class ListDrinkActivity : BaseActivity() {
                 .setMessage(getString(R.string.msg_confirm_delete_all))
                 .setPositiveButton(getString(R.string.delete_all)) { _: DialogInterface?, _: Int ->
                     MyApplication[this@ListDrinkActivity].getDrinkDatabaseReference()
-                            .removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@removeValue
+                                }
                                 showToast(getString(R.string.msg_delete_all_drink_success))
                                 GlobalFuntion.hideSoftKeyboard(this@ListDrinkActivity)
                             }
@@ -400,7 +493,9 @@ class ListDrinkActivity : BaseActivity() {
                         }
                     }
 
-                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onCancelled(error: DatabaseError) {
+                        showToast(error.message)
+                    }
                 })
     }
 }

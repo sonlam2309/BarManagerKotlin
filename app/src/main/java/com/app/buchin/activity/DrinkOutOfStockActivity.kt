@@ -38,8 +38,8 @@ class DrinkOutOfStockActivity : BaseActivity() {
                 if (StringUtil.isEmpty(mKeySeach)) {
                     mListDrink?.add(0, drink)
                 } else {
-                    if (GlobalFuntion.getTextSearch(drink.getName())!!.toLowerCase(Locale.getDefault())
-                                    .contains(GlobalFuntion.getTextSearch(mKeySeach)!!.toLowerCase(Locale.getDefault()))) {
+                    if (GlobalFuntion.getTextSearch(drink.getName())!!.lowercase(Locale.getDefault())
+                                    .contains(GlobalFuntion.getTextSearch(mKeySeach)!!.lowercase(Locale.getDefault()))) {
                         mListDrink?.add(0, drink)
                     }
                 }
@@ -88,7 +88,7 @@ class DrinkOutOfStockActivity : BaseActivity() {
 
         override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {}
         override fun onCancelled(databaseError: DatabaseError) {
-            showToast(getString(R.string.msg_get_data_error))
+            showToast(databaseError.message)
         }
     }
 

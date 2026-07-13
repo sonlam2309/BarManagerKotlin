@@ -98,7 +98,7 @@ class ProfitActivity : BaseActivity() {
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        showToast(getString(R.string.msg_get_data_error))
+                        showToast(databaseError.message)
                     }
                 })
     }

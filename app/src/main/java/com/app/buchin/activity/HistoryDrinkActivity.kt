@@ -281,7 +281,11 @@ class HistoryDrinkActivity : BaseActivity() {
                     newHistory.setDate(strDate.toLong())
                     MyApplication[this@HistoryDrinkActivity].getHistoryDatabaseReference()
                             .child(newHistory.getId().toString())
-                            .setValue(newHistory) { _: DatabaseError?, _: DatabaseReference? ->
+                            .setValue(newHistory) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@setValue
+                                }
                                 if (isDrinkUsed) {
                                     showToast(getString(R.string.msg_used_drink_success))
                                 } else {
@@ -305,14 +309,19 @@ class HistoryDrinkActivity : BaseActivity() {
                 map["totalPrice"] = strQuantity.toInt() * strPrice.toInt()
                 MyApplication[this@HistoryDrinkActivity].getHistoryDatabaseReference()
                         .child(history!!.getId().toString())
-                        .updateChildren(map) { _: DatabaseError?, _: DatabaseReference? ->
+                        .updateChildren(map) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                            if (databaseError != null) {
+                                showToast(databaseError.message)
+                                return@updateChildren
+                            }
                             GlobalFuntion.hideSoftKeyboard(this@HistoryDrinkActivity)
                             if (isDrinkUsed) {
                                 showToast(getString(R.string.msg_edit_used_history_success))
                             } else {
                                 showToast(getString(R.string.msg_edit_add_history_success))
                             }
-                            changeQuantity(history.getDrinkId(), strQuantity.toInt() - history.getQuantity(), !isDrinkUsed)
+                            updateQuantityAfterEditHistory(history, mDrinkSelected?.getId() ?: history.getDrinkId(),
+                                    strQuantity.toInt())
                             dialog.dismiss()
                         }
             }
@@ -320,32 +329,42 @@ class HistoryDrinkActivity : BaseActivity() {
         dialog.show()
     }
 
+    private fun updateQuantityAfterEditHistory(history: History, newDrinkId: Long, newQuantity: Int) {
+        val isAddHistory = !isDrinkUsed
+        if (history.getDrinkId() == newDrinkId) {
+            changeQuantity(history.getDrinkId(), newQuantity - history.getQuantity(), isAddHistory)
+            return
+        }
+        changeQuantity(history.getDrinkId(), history.getQuantity(), !isAddHistory)
+        changeQuantity(newDrinkId, newQuantity, isAddHistory)
+    }
+
     private fun changeQuantity(drinkId: Long, quantity: Int, isAdd: Boolean) {
         MyApplication[this@HistoryDrinkActivity].getQuantityDatabaseReference(drinkId)
-                .addValueEventListener(object : ValueEventListener {
+                .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val currentQuantity: Int? = snapshot.getValue<Int>(Int::class.java)
-                        var totalQuantity = 0
-                        if (isAdd) {
-                            if (currentQuantity != null) {
-                                totalQuantity = currentQuantity + quantity
-                            }
+                        val currentQuantity = snapshot.getValue<Int>(Int::class.java) ?: 0
+                        val totalQuantity = if (isAdd) {
+                            currentQuantity + quantity
                         } else {
-                            if (currentQuantity != null) {
-                                totalQuantity = currentQuantity - quantity
-                            }
+                            currentQuantity - quantity
                         }
-                        MyApplication[this@HistoryDrinkActivity].getQuantityDatabaseReference(drinkId).removeEventListener(this)
                         updateQuantityToFirebase(drinkId, totalQuantity)
                     }
 
-                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onCancelled(error: DatabaseError) {
+                        showToast(error.message)
+                    }
                 })
     }
 
     private fun updateQuantityToFirebase(drinkId: Long, quantity: Int) {
         MyApplication[this@HistoryDrinkActivity].getQuantityDatabaseReference(drinkId)
-                .setValue(quantity)
+                .setValue(quantity) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                    if (databaseError != null) {
+                        showToast(databaseError.message)
+                    }
+                }
     }
 
     private fun getPositionDrinkUpdate(history: History?): Int {
@@ -378,7 +397,11 @@ class HistoryDrinkActivity : BaseActivity() {
                 .setPositiveButton(getString(R.string.action_delete)) { _: DialogInterface?, _: Int ->
                     MyApplication[this@HistoryDrinkActivity].getHistoryDatabaseReference()
                             .child(history?.getId().toString())
-                            .removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@removeValue
+                                }
                                 if (isDrinkUsed) {
                                     showToast(getString(R.string.msg_delete_used_history_success))
                                 } else {

@@ -1,37 +1,26 @@
 {
   "project_info": {
-    "project_number": "377665476980",
-    "firebase_url": "https://buchin-bar-default-rtdb.firebaseio.com",
-    "project_id": "buchin-bar",
-    "storage_bucket": "buchin-bar.appspot.com"
+    "project_number": "1080090747025",
+    "project_id": "barmanagerkotlin",
+    "storage_bucket": "barmanagerkotlin.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:377665476980:android:a624b59dcff176ba53f421",
+        "mobilesdk_app_id": "1:1080090747025:android:7c4710be9f115d21b99f30",
         "android_client_info": {
           "package_name": "com.app.buchin"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "377665476980-0i678eual4a55sudm61j5ukf688m61al.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCKfakWDf4xgAW8XgrMnmrAfrTdMk5yaZA"
+          "current_key": "AIzaSyAgu-ZbXgO4-c8Lvg4dx2Bk0WfAgyRjqVc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "377665476980-0i678eual4a55sudm61j5ukf688m61al.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

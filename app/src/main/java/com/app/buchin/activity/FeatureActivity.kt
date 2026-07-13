@@ -37,7 +37,7 @@ class FeatureActivity : BaseActivity() {
     }
 
     private fun showAdmobBanner() {
-        MobileAds.initialize(this, "ca-app-pub-8577216370890753~4422934437")
+        MobileAds.initialize(this)
         val adView = findViewById<AdView?>(R.id.adView)
         val adRequest = AdRequest.Builder().build()
         adView?.loadAd(adRequest)

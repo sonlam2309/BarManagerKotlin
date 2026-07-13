@@ -42,8 +42,8 @@ class UnitActivity : BaseActivity() {
             if (StringUtil.isEmpty(mKeySeach)) {
                 mListUnit!!.add(0, unitObject)
             } else {
-                if (GlobalFuntion.getTextSearch(unitObject.getName())!!.toLowerCase(Locale.getDefault())
-                                .contains(GlobalFuntion.getTextSearch(mKeySeach)!!.toLowerCase(Locale.getDefault()))) {
+                if (GlobalFuntion.getTextSearch(unitObject.getName())!!.lowercase(Locale.getDefault())
+                                .contains(GlobalFuntion.getTextSearch(mKeySeach)!!.lowercase(Locale.getDefault()))) {
                     mListUnit!!.add(0, unitObject)
                 }
             }
@@ -82,7 +82,7 @@ class UnitActivity : BaseActivity() {
 
         override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {}
         override fun onCancelled(databaseError: DatabaseError) {
-            showToast(getString(R.string.msg_get_data_error))
+            showToast(databaseError.message)
         }
     }
 
@@ -240,7 +240,7 @@ class UnitActivity : BaseActivity() {
                     showToast(getString(R.string.msg_unit_name_require))
                     return
                 }
-                if (isUnitExist(strUnitName)) {
+                if (isUnitExist(strUnitName, unitObject)) {
                     showToast(getString(R.string.msg_unit_exist))
                     return
                 }
@@ -250,7 +250,11 @@ class UnitActivity : BaseActivity() {
                     unit.setId(id)
                     unit.setName(strUnitName)
                     MyApplication[this@UnitActivity].getUnitDatabaseReference()
-                            .child(id.toString()).setValue(unit) { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(id.toString()).setValue(unit) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@setValue
+                                }
                                 GlobalFuntion.hideSoftKeyboard(this@UnitActivity, edtUnitName)
                                 showToast(getString(R.string.msg_add_unit_success))
                                 dialog.dismiss()
@@ -260,7 +264,11 @@ class UnitActivity : BaseActivity() {
                     val map: MutableMap<String?, Any?> = HashMap()
                     map["name"] = strUnitName
                     MyApplication[this@UnitActivity].getUnitDatabaseReference()
-                            .child(unitObject.getId().toString()).updateChildren(map) { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(unitObject.getId().toString()).updateChildren(map) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@updateChildren
+                                }
                                 GlobalFuntion.hideSoftKeyboard(this@UnitActivity, edtUnitName)
                                 showToast(getString(R.string.msg_edit_unit_success))
                                 dialog.dismiss()
@@ -274,12 +282,12 @@ class UnitActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun isUnitExist(unitName: String?): Boolean {
+    private fun isUnitExist(unitName: String?, currentUnit: UnitObject?): Boolean {
         if (mListUnit == null || mListUnit!!.isEmpty()) {
             return false
         }
         for (unitObject in mListUnit!!) {
-            if (unitName == unitObject.getName()) {
+            if (currentUnit?.getId() != unitObject.getId() && unitName == unitObject.getName()) {
                 return true
             }
         }
@@ -292,7 +300,11 @@ class UnitActivity : BaseActivity() {
                 .setMessage(getString(R.string.msg_confirm_delete))
                 .setPositiveButton(getString(R.string.action_delete)) { _: DialogInterface?, _: Int ->
                     MyApplication[this@UnitActivity].getUnitDatabaseReference()
-                            .child(unitObject?.getId().toString()).removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .child(unitObject?.getId().toString()).removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@removeValue
+                                }
                                 showToast(getString(R.string.msg_delete_unit_success))
                                 GlobalFuntion.hideSoftKeyboard(this@UnitActivity)
                             }
@@ -307,7 +319,11 @@ class UnitActivity : BaseActivity() {
                 .setMessage(getString(R.string.msg_confirm_delete_all))
                 .setPositiveButton(getString(R.string.delete_all)) { _: DialogInterface?, _: Int ->
                     MyApplication[this@UnitActivity].getUnitDatabaseReference()
-                            .removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    showToast(databaseError.message)
+                                    return@removeValue
+                                }
                                 showToast(getString(R.string.msg_delete_all_unit_success))
                                 GlobalFuntion.hideSoftKeyboard(this@UnitActivity)
                             }
@@ -339,7 +355,9 @@ class UnitActivity : BaseActivity() {
                         }
                     }
 
-                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onCancelled(error: DatabaseError) {
+                        showToast(error.message)
+                    }
                 })
     }
 
@@ -366,7 +384,9 @@ class UnitActivity : BaseActivity() {
                         }
                     }
 
-                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onCancelled(error: DatabaseError) {
+                        showToast(error.message)
+                    }
                 })
     }
 }

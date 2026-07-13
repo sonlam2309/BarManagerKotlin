@@ -199,7 +199,11 @@ class DrinkDetailUsedFragment(private val mDrink: Drink?) : Fragment() {
                     if (activity != null) {
                         MyApplication[activity].getHistoryDatabaseReference()
                                 .child(historyObject.getId().toString())
-                                .setValue(historyObject) { _: DatabaseError?, _: DatabaseReference? ->
+                                .setValue(historyObject) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                    if (databaseError != null) {
+                                        GlobalFuntion.showToast(activity, databaseError.message)
+                                        return@setValue
+                                    }
                                     GlobalFuntion.showToast(activity, getString(R.string.msg_used_drink_success))
                                     changeQuantity(historyObject.getDrinkId(), historyObject.getQuantity(), false)
                                     GlobalFuntion.hideSoftKeyboard(activity)
@@ -215,7 +219,11 @@ class DrinkDetailUsedFragment(private val mDrink: Drink?) : Fragment() {
                     if (activity != null) {
                         MyApplication[activity].getHistoryDatabaseReference()
                                 .child(history.getId().toString())
-                                .updateChildren(map) { _: DatabaseError?, _: DatabaseReference? ->
+                                .updateChildren(map) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                    if (databaseError != null) {
+                                        GlobalFuntion.showToast(activity, databaseError.message)
+                                        return@updateChildren
+                                    }
                                     GlobalFuntion.hideSoftKeyboard(activity)
                                     GlobalFuntion.showToast(activity, getString(R.string.msg_edit_used_history_success))
                                     changeQuantity(history.getDrinkId(), strQuantity.toInt() - history.getQuantity(), false)
@@ -233,26 +241,27 @@ class DrinkDetailUsedFragment(private val mDrink: Drink?) : Fragment() {
             return
         }
         MyApplication[activity].getQuantityDatabaseReference(drinkId)
-                .addValueEventListener(object : ValueEventListener {
+                .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val currentQuantity: Int? = snapshot.getValue<Int>(Int::class.java)
-                        var totalQuantity = 0
-                        if (isAdd) {
-                            if (currentQuantity != null) {
-                                totalQuantity = currentQuantity + quantity
-                            }
+                        val currentQuantity = snapshot.getValue<Int>(Int::class.java) ?: 0
+                        val totalQuantity = if (isAdd) {
+                            currentQuantity + quantity
                         } else {
-                            if (currentQuantity != null) {
-                                totalQuantity = currentQuantity - quantity
-                            }
+                            currentQuantity - quantity
                         }
                         if (activity != null) {
-                            MyApplication[activity].getQuantityDatabaseReference(drinkId).removeEventListener(this)
-                            MyApplication[activity].getQuantityDatabaseReference(drinkId).setValue(totalQuantity)
+                            MyApplication[activity].getQuantityDatabaseReference(drinkId)
+                                    .setValue(totalQuantity) { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                        if (databaseError != null) {
+                                            GlobalFuntion.showToast(activity, databaseError.message)
+                                        }
+                                    }
                         }
                     }
 
-                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onCancelled(error: DatabaseError) {
+                        GlobalFuntion.showToast(activity, error.message)
+                    }
                 })
     }
 
@@ -266,7 +275,11 @@ class DrinkDetailUsedFragment(private val mDrink: Drink?) : Fragment() {
                 .setPositiveButton(getString(R.string.action_delete)) { _: DialogInterface?, _: Int ->
                     MyApplication[activity].getHistoryDatabaseReference()
                             .child(history!!.getId().toString())
-                            .removeValue { _: DatabaseError?, _: DatabaseReference? ->
+                            .removeValue { databaseError: DatabaseError?, _: DatabaseReference? ->
+                                if (databaseError != null) {
+                                    GlobalFuntion.showToast(activity, databaseError.message)
+                                    return@removeValue
+                                }
                                 GlobalFuntion.showToast(activity, getString(R.string.msg_delete_used_history_success))
                                 changeQuantity(history.getDrinkId(), history.getQuantity(), true)
                                 GlobalFuntion.hideSoftKeyboard(activity)
