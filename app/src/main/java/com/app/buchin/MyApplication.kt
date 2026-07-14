@@ -19,6 +19,7 @@ class MyApplication : Application() {
         testFirebase()
     }
 
+
     /**
      * Kiểm tra kết nối Firebase
      */
@@ -26,26 +27,27 @@ class MyApplication : Application() {
 
         Log.d("MY_APP", "========== testFirebase() called ==========")
 
-        FirebaseDatabase
-            .getInstance(FIREBASE_URL)
-            .reference
-            .get()
-            .addOnSuccessListener { snapshot ->
+        val db = FirebaseDatabase.getInstance(FIREBASE_URL)
+        val ref = db.reference
 
+        Log.d("MY_APP", "Database instance obtained, URL: $FIREBASE_URL")
+
+        ref.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val snapshot = task.result
                 Log.d("FIREBASE_TEST", "========== CONNECT SUCCESS ==========")
                 Log.d("FIREBASE_TEST", "Exists = ${snapshot.exists()}")
                 Log.d("FIREBASE_TEST", "Children Count = ${snapshot.childrenCount}")
                 Log.d("FIREBASE_TEST", "Data = ${snapshot.value}")
                 Log.d("FIREBASE_TEST", "=====================================")
-
-            }
-            .addOnFailureListener { e ->
-
+            } else {
+                val e = task.exception
                 Log.e("FIREBASE_TEST", "========== CONNECT FAIL ==========")
-                Log.e("FIREBASE_TEST", "Message = ${e.message}")
+                Log.e("FIREBASE_TEST", "Message = ${e?.message}")
+                Log.e("FIREBASE_TEST", "Error Code = ${e.toString()}")
                 Log.e("FIREBASE_TEST", "==================================")
-
             }
+        }
     }
 
     fun getUnitDatabaseReference(): DatabaseReference {
