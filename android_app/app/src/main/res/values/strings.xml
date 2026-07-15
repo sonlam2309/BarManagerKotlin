@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Bar Manager Kotlin</string>
+    <string name="splash_title">Quản lý đồ uống</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
+    <string name="action_ok">Đồng ý</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_add">Thêm</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_edit">Chỉnh sửa</string>
+
+    <string name="feature_list_menu">Tên đồ uống</string>
+    <string name="feature_manage_unit">Tên đơn vị</string>
+    <string name="feature_add_drink">Nhập hàng</string>
+    <string name="feature_drink_used">Tiêu thụ</string>
+    <string name="feature_manage_drink">Quản lý</string>
+    <string name="feature_drink_out_of_stock">Hết hàng</string>
+    <string name="feature_revenue">Doanh thu</string>
+    <string name="feature_cost">Chi phí</string>
+    <string name="feature_profit">Lợi nhuận</string>
+    <string name="feature_drink_popular">Bán chạy</string>
+
+    <string name="delete_all">Xóa tất cả</string>
+    <string name="add_drink_name">Nhập tên đồ uống</string>
+    <string name="edit_drink_name">Chỉnh sửa tên đồ uống</string>
+    <string name="confirm_delete">Xác nhận xóa</string>
+    <string name="add_unit_name">Nhập tên đơn vị</string>
+    <string name="edit_unit_name">Chỉnh sửa tên đơn vị</string>
+    <string name="list_drink_buy">Danh sách đồ uống đã mua</string>
+    <string name="list_drink_used">Danh sách đồ uống đã tiêu thụ</string>
+    <string name="label_total_price">Tổng tiền:</string>
+    <string name="label_total_revenue">Tổng doanh thu:</string>
+    <string name="label_total_cost">Tổng chi phí:</string>
+    <string name="label_total_profit">Tổng lợi nhuận:</string>
+    <string name="label_quantity">Số lượng:</string>
+    <string name="label_unit">Đơn vị:</string>
+    <string name="label_current_quantity">Hiện tại còn:</string>
+    <string name="label_detail">Chi tiết</string>
+    <string name="label_currency">000 VNĐ</string>
+    <string name="edit_history_add">Chỉnh sửa lịch sử nhập đồ uống</string>
+    <string name="edit_history_used">Chỉnh sửa lịch sử tiêu thụ đồ uống</string>
+    <string name="label_added">Đã nhập</string>
+    <string name="label_used">Đã tiêu thụ</string>
+    <string name="column_stt">STT</string>
+    <string name="column_drink_name">Đồ uống</string>
+    <string name="column_quantity">Số lượng</string>
+    <string name="column_total_amount">Tổng Tiền</string>
+    <string name="label_date_from">Từ ngày:</string>
+    <string name="label_date_to">Đến ngày:</string>
+    <string name="column_current_quantity">Tồn kho</string>
+    <string name="column_profit">Lãi/Lỗ</string>
+
+    <string name="hint_drink_name">Tên đồ uống…</string>
+    <string name="hint_unit_name">Tên đơn vị…</string>
+    <string name="hint_quantity">Số lượng…</string>
+    <string name="hint_price">Đơn giá…</string>
+
+    <string name="msg_confirm_exit_app">Bạn có chắc chắn muốn thoát ứng dụng không?</string>
+    <string name="msg_feature_pending">Tính năng đang được phát triển</string>
+    <string name="msg_waiting">Vui lòng đợi…</string>
+    <string name="msg_get_data_error">Không lấy được dữ liệu, vui lòng kiểm tra kết nối mạng của bạn</string>
+    <string name="msg_drink_name_require">Vui lòng nhập tên đồ uống</string>
+    <string name="msg_drink_exist">Đồ uống đã tồn tại</string>
+    <string name="msg_add_drink_success">Thêm đồ uống thành công</string>
+    <string name="msg_used_drink_success">Thêm lịch sử tiêu thụ đồ uống thành công</string>
+    <string name="msg_edit_drink_success">Chỉnh sửa đồ uống thành công</string>
+    <string name="msg_confirm_delete">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="msg_delete_drink_success">Xóa đồ uống thành công</string>
+    <string name="msg_confirm_delete_all">Bạn có chắc chắn muốn xóa tất cả không?</string>
+    <string name="msg_delete_all_drink_success">Xóa tất cả đồ uống thành công</string>
+
+    <string name="msg_unit_name_require">Vui lòng nhập tên đơn vị</string>
+    <string name="msg_unit_exist">Đơn vị đã tồn tại</string>
+    <string name="msg_delete_unit_success">Xóa đơn vị thành công</string>
+    <string name="msg_delete_all_unit_success">Xóa tất cả đơn vị thành công</string>
+    <string name="msg_add_unit_success">Thêm đơn vị thành công</string>
+    <string name="msg_edit_unit_success">Chỉnh sửa đơn vị thành công</string>
+    <string name="msg_list_drink_require">Vui lòng nhập danh sách đồ uống ngoài màn hình chính</string>
+    <string name="msg_list_unit_require">Vui lòng nhập danh sách đơn vị ngoài màn hình chính</string>
+    <string name="msg_enter_full_infor">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="msg_delete_add_history_success">Xoá lịch sử nhập đồ uống thành công</string>
+    <string name="msg_delete_used_history_success">Xoá lịch sử tiêu thụ đồ uống thành công</string>
+    <string name="msg_edit_add_history_success">Chỉnh sửa lịch sử nhập đồ uống thành công</string>
+    <string name="msg_edit_used_history_success">Chỉnh sửa lịch sử tiêu thụ đồ uống thành công</string>
+</resources>
